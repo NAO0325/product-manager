@@ -136,13 +136,14 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleHttpMessageNotReadableShouldReturnInvalidJsonError() {
+    void handleJsonParsingErrorsShouldReturnInvalidJsonError() {
         // Given
         String errorMessage = "JSON parse error: Cannot deserialize criteria";
-        HttpMessageNotReadableException exception = new HttpMessageNotReadableException(errorMessage);
+        HttpMessageNotReadableException exception = Mockito.mock(HttpMessageNotReadableException.class);
+        when(exception.getMessage()).thenReturn(errorMessage);
 
         // When
-        ResponseEntity<Error> response = exceptionHandler.handleHttpMessageNotReadable(exception, webRequest);
+        ResponseEntity<Error> response = exceptionHandler.handleJsonParsingErrors(exception, webRequest);
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -158,13 +159,14 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleHttpMessageNotReadableShouldProvideSpecificHintsForCriteria() {
+    void handleJsonParsingErrorsShouldProvideSpecificHintsForCriteria() {
         // Given
         String errorMessage = "JSON parse error: Missing criteria field";
-        HttpMessageNotReadableException exception = new HttpMessageNotReadableException(errorMessage);
+        HttpMessageNotReadableException exception = Mockito.mock(HttpMessageNotReadableException.class);
+        when(exception.getMessage()).thenReturn(errorMessage);
 
         // When
-        ResponseEntity<Error> response = exceptionHandler.handleHttpMessageNotReadable(exception, webRequest);
+        ResponseEntity<Error> response = exceptionHandler.handleJsonParsingErrors(exception, webRequest);
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -177,13 +179,14 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleHttpMessageNotReadableShouldProvideSpecificHintsForWeights() {
+    void handleJsonParsingErrorsShouldProvideSpecificHintsForWeights() {
         // Given
         String errorMessage = "JSON parse error: Invalid weights format";
-        HttpMessageNotReadableException exception = new HttpMessageNotReadableException(errorMessage);
+        HttpMessageNotReadableException exception = Mockito.mock(HttpMessageNotReadableException.class);
+        when(exception.getMessage()).thenReturn(errorMessage);
 
         // When
-        ResponseEntity<Error> response = exceptionHandler.handleHttpMessageNotReadable(exception, webRequest);
+        ResponseEntity<Error> response = exceptionHandler.handleJsonParsingErrors(exception, webRequest);
 
         // Then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());

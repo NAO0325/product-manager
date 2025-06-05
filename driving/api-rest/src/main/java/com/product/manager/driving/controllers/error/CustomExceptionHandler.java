@@ -79,7 +79,7 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    protected ResponseEntity<Error> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, WebRequest request) {
+    protected ResponseEntity<Error> handleJsonParsingErrors(HttpMessageNotReadableException ex, WebRequest request) {
         Error error = new Error();
         error.setCode(Error.CodeEnum.INVALID_JSON);
         error.setMessage("Invalid JSON format or missing required fields");
@@ -101,7 +101,6 @@ public class CustomExceptionHandler {
         }
 
         error.setDetails(details);
-
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -116,12 +115,12 @@ public class CustomExceptionHandler {
         details.put("parameter", ex.getName());
         details.put("providedValue", ex.getValue());
 
+        // Verificar null de forma más segura
         Class<?> requiredType = ex.getRequiredType();
         String expectedType = (requiredType != null) ? requiredType.getSimpleName() : "unknown";
         details.put("expectedType", expectedType);
 
         error.setDetails(details);
-
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -134,7 +133,6 @@ public class CustomExceptionHandler {
 
         Map<String, Object> details = new HashMap<>();
         details.put("type", ex.getClass().getSimpleName());
-        // details.put("originalMessage", ex.getMessage());
         error.setDetails(details);
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);

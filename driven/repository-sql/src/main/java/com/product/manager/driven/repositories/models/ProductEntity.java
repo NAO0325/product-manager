@@ -1,10 +1,7 @@
 package com.product.manager.driven.repositories.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -29,5 +26,7 @@ public class ProductEntity implements Serializable {
     private Integer salesUnits;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<ProductStockEntity> stocks;
 }
