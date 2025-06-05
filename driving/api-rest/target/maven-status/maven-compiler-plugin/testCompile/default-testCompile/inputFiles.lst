@@ -1,0 +1,4 @@
+/opt/proyectos/java/product-manager/driving/api-rest/src/test/java/com/product/manager/driving/controllers/adapters/ProductControllerAdapterTest.java
+/opt/proyectos/java/product-manager/driving/api-rest/src/test/java/com/product/manager/driving/controllers/error/CustomExceptionHandlerTest.java
+/opt/proyectos/java/product-manager/driving/api-rest/src/test/java/com/product/manager/driving/controllers/mappers/ProductMapperTest.java
+/opt/proyectos/java/product-manager/driving/api-rest/src/test/java/com/product/manager/driving/controllers/utils/ProductMocks.java

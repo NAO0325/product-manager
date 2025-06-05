@@ -1,0 +1,6 @@
+/opt/proyectos/java/product-manager/application/src/main/java/com/product/manager/application/ports/driving/ProductServicePort.java
+/opt/proyectos/java/product-manager/application/src/main/java/com/product/manager/application/ports/driven/ProductRepositoryPort.java
+/opt/proyectos/java/product-manager/application/src/main/java/com/product/manager/domain/services/ProductSortingService.java
+/opt/proyectos/java/product-manager/application/src/main/java/com/product/manager/application/services/ProductServiceUseCase.java
+/opt/proyectos/java/product-manager/application/src/main/java/com/product/manager/domain/valueobjects/SortingCriteria.java
+/opt/proyectos/java/product-manager/application/src/main/java/com/product/manager/domain/Product.java

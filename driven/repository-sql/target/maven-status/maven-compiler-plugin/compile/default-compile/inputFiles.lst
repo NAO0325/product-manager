@@ -1,0 +1,7 @@
+/opt/proyectos/java/product-manager/driven/repository-sql/src/main/java/com/product/manager/driven/repositories/models/ProductStockEntity.java
+/opt/proyectos/java/product-manager/driven/repository-sql/src/main/java/com/product/manager/driven/repositories/config/RepositoryConfig.java
+/opt/proyectos/java/product-manager/driven/repository-sql/src/main/java/com/product/manager/driven/repositories/mappers/ProductEntityMapper.java
+/opt/proyectos/java/product-manager/driven/repository-sql/src/main/java/com/product/manager/driven/repositories/ProductJpaRepository.java
+/opt/proyectos/java/product-manager/driven/repository-sql/src/main/java/com/product/manager/driven/repositories/models/ProductEntity.java
+/opt/proyectos/java/product-manager/driven/repository-sql/src/main/java/com/product/manager/driven/repositories/models/ProductStockId.java
+/opt/proyectos/java/product-manager/driven/repository-sql/src/main/java/com/product/manager/driven/repositories/adapters/ProductRepositoryAdapter.java

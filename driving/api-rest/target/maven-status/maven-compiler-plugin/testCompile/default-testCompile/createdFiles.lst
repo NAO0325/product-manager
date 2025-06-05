@@ -1,0 +1,4 @@
+com/product/manager/driving/controllers/mappers/ProductMapperTest.class
+com/product/manager/driving/controllers/adapters/ProductControllerAdapterTest.class
+com/product/manager/driving/controllers/utils/ProductMocks.class
+com/product/manager/driving/controllers/error/CustomExceptionHandlerTest.class

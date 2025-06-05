@@ -1,0 +1,295 @@
+openapi: 3.0.3
+
+info:
+  title: Product Manager API
+  version: 1.0.0
+  contact:
+    name: DEV (Napoleon Avila Ochoa)
+    email: napoavi@gmail.com
+  description: API for product management and sorting services.
+
+servers:
+  - url: http://localhost:8080
+    description: Development environment
+  - url: https://api.company.com
+    description: Production environment
+
+tags:
+  - name: Product Sorting
+    description: API to sort products by different criteria
+
+paths:
+  /v1/products/sort:
+    post:
+      tags:
+        - Product Sorting
+      summary: Sort products by weighted criteria
+      description: |
+        Sorts products based on weighted criteria such as sales units and stock ratio.
+        Returns products ordered by calculated score (highest to lowest).
+        
+        **Supported Criteria:**
+        - `sales_units`: Weight for sales performance (0.0 - 1.0)
+        - `stock_ratio`: Weight for stock availability ratio (0.0 - 1.0)
+        
+        **Future extensibility:** New criteria can be added without breaking the API.
+      operationId: sortProducts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SortProductsRequest"
+            examples:
+              balanced_criteria:
+                summary: Balanced criteria (50% sales, 50% stock)
+                value:
+                  criteria:
+                    weights:
+                      sales_units: 0.5
+                      stock_ratio: 0.5
+              sales_focused:
+                summary: Sales focused (70% sales, 30% stock)
+                value:
+                  criteria:
+                    weights:
+                      sales_units: 0.7
+                      stock_ratio: 0.3
+              stock_focused:
+                summary: Stock focused (30% sales, 70% stock)
+                value:
+                  criteria:
+                    weights:
+                      sales_units: 0.3
+                      stock_ratio: 0.7
+              sales_only:
+                summary: Sales only
+                value:
+                  criteria:
+                    weights:
+                      sales_units: 1.0
+                      stock_ratio: 0.0
+      responses:
+        "200":
+          description: Products successfully sorted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SortProductsResponse"
+              examples:
+                success_response:
+                  summary: Successful sorting response
+                  value:
+                    products:
+                      - id: 5
+                        name: "CONTRASTING LACE T-SHIRT"
+                        salesUnits: 650
+                        stockBySizes:
+                          S: 0
+                          M: 1
+                          L: 0
+                        stockRatio: 0.33
+                      - id: 1
+                        name: "V-NECH BASIC SHIRT"
+                        salesUnits: 100
+                        stockBySizes:
+                          S: 4
+                          M: 9
+                          L: 0
+                        stockRatio: 0.67
+                      - id: 2
+                        name: "CONTRASTING FABRIC T-SHIRT"
+                        salesUnits: 50
+                        stockBySizes:
+                          S: 35
+                          M: 9
+                          L: 9
+                        stockRatio: 1.0
+                    appliedCriteria:
+                      weights:
+                        sales_units: 0.7
+                        stock_ratio: 0.3
+                    totalProducts: 3
+                    timestamp: "2024-06-03T14:30:00Z"
+        "400":
+          description: Invalid sorting criteria
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid_weights:
+                  summary: Invalid weight values
+                  value:
+                    code: "INVALID_CRITERIA"
+                    message: "Weight values must be non-negative numbers"
+                    timestamp: "2024-06-03T14:30:00Z"
+                missing_weights:
+                  summary: Missing criteria weights
+                  value:
+                    code: "MISSING_CRITERIA"
+                    message: "At least one sorting criteria weight must be provided"
+                    timestamp: "2024-06-03T14:30:00Z"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                server_error:
+                  summary: Internal server error
+                  value:
+                    code: "INTERNAL_ERROR"
+                    message: "An unexpected error occurred while processing the request"
+                    timestamp: "2024-06-03T14:30:00Z"
+
+components:
+  schemas:
+    SortProductsRequest:
+      type: object
+      required:
+        - criteria
+      properties:
+        criteria:
+          $ref: "#/components/schemas/SortingCriteria"
+      example:
+        criteria:
+          weights:
+            sales_units: 0.7
+            stock_ratio: 0.3
+
+    SortingCriteria:
+      type: object
+      required:
+        - weights
+      properties:
+        weights:
+          type: object
+          description: |
+            Map of criteria names to their weights. Weights should be non-negative numbers.
+            The system will normalize the weights internally.
+          additionalProperties:
+            type: number
+            format: double
+            minimum: 0.0
+          properties:
+            sales_units:
+              type: number
+              format: double
+              minimum: 0.0
+              maximum: 1.0
+              description: Weight for sales units criteria
+              example: 0.7
+            stock_ratio:
+              type: number
+              format: double
+              minimum: 0.0
+              maximum: 1.0
+              description: Weight for stock ratio criteria
+              example: 0.3
+          example:
+            sales_units: 0.7
+            stock_ratio: 0.3
+
+    SortProductsResponse:
+      type: object
+      required:
+        - products
+        - appliedCriteria
+        - totalProducts
+        - timestamp
+      properties:
+        products:
+          type: array
+          description: Products sorted by calculated score (highest to lowest)
+          items:
+            $ref: "#/components/schemas/Product"
+        appliedCriteria:
+          $ref: "#/components/schemas/SortingCriteria"
+          description: The criteria that were applied for sorting
+        totalProducts:
+          type: integer
+          description: Total number of products returned
+          example: 6
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp when the sorting was performed
+          example: "2024-06-03T14:30:00Z"
+
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - salesUnits
+        - stockBySizes
+        - stockRatio
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Product identifier
+          example: 1
+        name:
+          type: string
+          description: Product name
+          example: "V-NECH BASIC SHIRT"
+        salesUnits:
+          type: integer
+          description: Number of units sold
+          minimum: 0
+          example: 100
+        stockBySizes:
+          type: object
+          description: Stock quantity by size
+          additionalProperties:
+            type: integer
+            minimum: 0
+          example:
+            S: 4
+            M: 9
+            L: 0
+        stockRatio:
+          type: number
+          format: double
+          description: Ratio of sizes with available stock (0.0 - 1.0)
+          minimum: 0.0
+          maximum: 1.0
+          example: 0.67
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+        - timestamp
+      properties:
+        code:
+          type: string
+          description: Error code identifier
+          enum:
+            - "INVALID_CRITERIA"
+            - "MISSING_CRITERIA"
+            - "VALIDATION_ERROR"
+            - "INTERNAL_ERROR"
+            - "INVALID_JSON"
+            - "INVALID_PARAMETER"
+          example: "INVALID_CRITERIA"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Weight values must be non-negative numbers"
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+          example: "2024-06-03T14:30:00Z"
+        details:
+          type: object
+          description: Additional error details (optional)
+          additionalProperties: true
+          example:
+            field: "criteria.weights.sales_units"
+            rejectedValue: -0.1

@@ -1,0 +1,13 @@
+com/product/manager/driving/controllers/models/SortingCriteriaWeights.class
+com/product/manager/driving/controllers/api/ApiUtil.class
+com/product/manager/driving/controllers/mappers/ProductMapper.class
+com/product/manager/driving/controllers/adapters/ProductControllerAdapter.class
+com/product/manager/driving/controllers/models/Error.class
+com/product/manager/driving/controllers/mappers/ProductMapperImpl.class
+com/product/manager/driving/controllers/error/CustomExceptionHandler.class
+com/product/manager/driving/controllers/models/SortProductsResponse.class
+com/product/manager/driving/controllers/models/Error$CodeEnum.class
+com/product/manager/driving/controllers/models/Product.class
+com/product/manager/driving/controllers/api/ProductSortingApi.class
+com/product/manager/driving/controllers/models/SortingCriteria.class
+com/product/manager/driving/controllers/models/SortProductsRequest.class

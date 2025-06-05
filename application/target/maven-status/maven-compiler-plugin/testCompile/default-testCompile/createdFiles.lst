@@ -1,0 +1,4 @@
+com/product/manager/domain/services/ProductSortingServiceTest.class
+com/product/manager/application/services/ProductServiceUseCaseTest.class
+com/product/manager/domain/valueobjects/SortingCriteriaTest.class
+com/product/manager/utils/ProductDomainMocks.class

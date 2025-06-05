@@ -1,0 +1,10 @@
+com/product/manager/driven/repositories/models/ProductEntity$ProductEntityBuilder.class
+com/product/manager/driven/repositories/mappers/ProductEntityMapper.class
+com/product/manager/driven/repositories/ProductJpaRepository.class
+com/product/manager/driven/repositories/adapters/ProductRepositoryAdapter.class
+com/product/manager/driven/repositories/models/ProductStockEntity.class
+com/product/manager/driven/repositories/models/ProductStockId.class
+com/product/manager/driven/repositories/models/ProductEntity.class
+com/product/manager/driven/repositories/mappers/ProductEntityMapperImpl.class
+com/product/manager/driven/repositories/config/RepositoryConfig.class
+com/product/manager/driven/repositories/models/ProductStockEntity$ProductStockEntityBuilder.class

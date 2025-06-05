@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SonarLintProjectSettings">
+    <option name="moduleMapping">
+      <map>
+        <entry key="product-manager" value="tariff-manager-web-back" />
+        <entry key="product-manager-api-rest" value="tariff-manager-web-back-api-rest" />
+        <entry key="product-manager-application" value="tariff-manager-web-back-application" />
+        <entry key="product-manager-boot" value="tariff-manager-web-back-boot" />
+        <entry key="product-manager-repository-sql" value="tariff-manager-web-back-repository-sql" />
+      </map>
+    </option>
+  </component>
+</project>
