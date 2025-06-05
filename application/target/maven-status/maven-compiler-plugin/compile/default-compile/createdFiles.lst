@@ -1,8 +1,0 @@
-com/product/manager/domain/services/ProductSortingService.class
-com/product/manager/domain/Product$ProductBuilder.class
-com/product/manager/domain/valueobjects/SortingCriteria.class
-com/product/manager/application/ports/driven/ProductRepositoryPort.class
-com/product/manager/domain/Product.class
-com/product/manager/application/services/ProductServiceUseCase.class
-com/product/manager/application/ports/driving/ProductServicePort.class
-com/product/manager/domain/valueobjects/SortingCriteria$SortingCriteriaBuilder.class
