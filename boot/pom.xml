@@ -7,6 +7,10 @@
     <name>product-manager-boot</name>
     <description>product-manager-boot</description>
 
+    <properties>
+        <sonar.projectKey>NAO0325_product-manager-boot</sonar.projectKey>
+    </properties>
+
     <parent>
         <groupId>com.product.manager</groupId>
         <artifactId>product-manager</artifactId>

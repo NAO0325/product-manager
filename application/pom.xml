@@ -7,6 +7,10 @@
     <name>product-manager-application</name>
     <description>product-manager-application</description>
 
+    <properties>
+        <sonar.projectKey>NAO0325_product-manager-application</sonar.projectKey>
+    </properties>
+
     <parent>
         <groupId>com.product.manager</groupId>
         <artifactId>product-manager</artifactId>
