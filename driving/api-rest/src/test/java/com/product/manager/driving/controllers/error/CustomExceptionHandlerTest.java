@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import java.time.ZoneOffset;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CustomExceptionHandlerTest {
@@ -312,5 +314,31 @@ class CustomExceptionHandlerTest {
         assertNotNull(response.getBody());
         assertEquals("INVALID_CRITERIA", response.getBody().getCode().getValue());
         assertNull(response.getBody().getMessage());
+    }
+
+    @Test
+    void shouldHandleTypeMismatchWithNullRequiredType() {
+        // Given
+        String parameterName = "testParam";
+
+        MethodArgumentTypeMismatchException exception = Mockito.mock(MethodArgumentTypeMismatchException.class);
+        when(exception.getName()).thenReturn(parameterName);
+        when(exception.getValue()).thenReturn("invalidValue");
+        when(exception.getRequiredType()).thenReturn(null);  // Simular caso null
+
+        // When
+        ResponseEntity<Error> response = exceptionHandler.handleTypeMismatch(exception, webRequest);
+
+        // Then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("INVALID_PARAMETER", response.getBody().getCode().getValue());
+        assertEquals("Parameter '" + parameterName + "' has invalid type", response.getBody().getMessage());
+
+        // Verificar que maneja correctamente el tipo null
+        Map<String, Object> details = response.getBody().getDetails();
+        assertEquals("unknown", details.get("expectedType"));
+        assertEquals(parameterName, details.get("parameter"));
+        assertEquals("invalidValue", details.get("providedValue"));
     }
 }

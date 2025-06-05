@@ -26,7 +26,7 @@ class ProductMapperTest {
     private ProductMapper productMapper;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mocks = new ProductMocks();
         productMapper = Mappers.getMapper(ProductMapper.class);
     }

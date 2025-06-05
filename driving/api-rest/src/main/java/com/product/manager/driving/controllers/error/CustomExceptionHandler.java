@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -35,7 +34,7 @@ public class CustomExceptionHandler {
             details.put("field", "criteria");
             details.put("issue", "Invalid sorting criteria provided");
             error.setDetails(details);
-        } else{
+        } else {
             error.setDetails(null);
         }
 
@@ -67,7 +66,7 @@ public class CustomExceptionHandler {
         Map<String, Object> details = new HashMap<>();
         Map<String, String> fieldErrors = new HashMap<>();
 
-        ex.getBindingResult().getAllErrors().forEach((objectError) -> {
+        ex.getBindingResult().getAllErrors().forEach(objectError -> {
             if (objectError instanceof FieldError fieldError) {
                 fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
             }
@@ -116,7 +115,11 @@ public class CustomExceptionHandler {
         Map<String, Object> details = new HashMap<>();
         details.put("parameter", ex.getName());
         details.put("providedValue", ex.getValue());
-        details.put("expectedType", ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
+
+        Class<?> requiredType = ex.getRequiredType();
+        String expectedType = (requiredType != null) ? requiredType.getSimpleName() : "unknown";
+        details.put("expectedType", expectedType);
+
         error.setDetails(details);
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
