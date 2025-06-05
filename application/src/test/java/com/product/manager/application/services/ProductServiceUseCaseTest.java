@@ -1,10 +1,10 @@
 package com.product.manager.application.services;
 
 import com.product.manager.application.ports.driven.ProductRepositoryPort;
-import com.product.manager.utils.ProductDomainMocks;
 import com.product.manager.domain.Product;
 import com.product.manager.domain.services.ProductSortingService;
 import com.product.manager.domain.valueobjects.SortingCriteria;
+import com.product.manager.utils.ProductDomainMocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

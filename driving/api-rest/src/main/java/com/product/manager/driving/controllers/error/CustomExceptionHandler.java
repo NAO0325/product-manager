@@ -21,6 +21,9 @@ import java.util.Map;
 @Component
 public class CustomExceptionHandler {
 
+    private static final String FIELD = "field";
+    private static final String ISSUE = "issue";
+    private static final String HINT = "hint";
     private static final String CRITERIA_FIELD = "criteria";
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -33,8 +36,8 @@ public class CustomExceptionHandler {
         // Agregar detalles específicos si el mensaje contiene información sobre criterios
         if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains(CRITERIA_FIELD)) {
             Map<String, Object> details = new HashMap<>();
-            details.put("field", CRITERIA_FIELD);
-            details.put("issue", "Invalid sorting criteria provided");
+            details.put(FIELD, CRITERIA_FIELD);
+            details.put(ISSUE, "Invalid sorting criteria provided");
             error.setDetails(details);
         } else {
             error.setDetails(null);
@@ -51,8 +54,8 @@ public class CustomExceptionHandler {
         error.setTimestamp(nowToUtcOffsetDateTime());
 
         Map<String, Object> details = new HashMap<>();
-        details.put("field", CRITERIA_FIELD);
-        details.put("issue", "Criteria cannot be null");
+        details.put(FIELD, CRITERIA_FIELD);
+        details.put(ISSUE, "Criteria cannot be null");
         error.setDetails(details);
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
@@ -88,17 +91,17 @@ public class CustomExceptionHandler {
         error.setTimestamp(nowToUtcOffsetDateTime());
 
         Map<String, Object> details = new HashMap<>();
-        details.put("issue", "Request body is not valid JSON or is missing required fields");
+        details.put(ISSUE, "Request body is not valid JSON or is missing required fields");
 
         // Intentar extraer información más específica del error
         String originalMessage = ex.getMessage();
         if (originalMessage != null) {
             if (originalMessage.contains(CRITERIA_FIELD)) {
-                details.put("field", CRITERIA_FIELD);
-                details.put("hint", "Ensure 'criteria' object is provided with valid 'weights'");
+                details.put(FIELD, CRITERIA_FIELD);
+                details.put(HINT, "Ensure 'criteria' object is provided with valid 'weights'");
             } else if (originalMessage.contains("weights")) {
-                details.put("field", "criteria.weights");
-                details.put("hint", "Ensure 'weights' is an object with numeric values");
+                details.put(FIELD, "criteria.weights");
+                details.put(HINT, "Ensure 'weights' is an object with numeric values");
             }
         }
 
