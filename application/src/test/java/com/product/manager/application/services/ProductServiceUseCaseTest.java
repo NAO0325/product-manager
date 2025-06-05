@@ -107,7 +107,7 @@ class ProductServiceUseCaseTest {
         assertNotNull(result);
 
         // Verificar que se pasó el criterio específico
-        verify(sortingService, times(1)).sortProducts(eq(mockProducts), eq(specificCriteria));
+        verify(sortingService, times(1)).sortProducts(mockProducts, specificCriteria);
     }
 
     @Test

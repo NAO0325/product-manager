@@ -21,6 +21,8 @@ import java.util.Map;
 @Component
 public class CustomExceptionHandler {
 
+    private static final String CRITERIA_FIELD = "criteria";
+
     @ExceptionHandler(IllegalArgumentException.class)
     protected ResponseEntity<Error> handleIllegalArgument(IllegalArgumentException ex, WebRequest request) {
         Error error = new Error();
@@ -29,9 +31,9 @@ public class CustomExceptionHandler {
         error.setTimestamp(nowToUtcOffsetDateTime());
 
         // Agregar detalles específicos si el mensaje contiene información sobre criterios
-        if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("criteria")) {
+        if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains(CRITERIA_FIELD)) {
             Map<String, Object> details = new HashMap<>();
-            details.put("field", "criteria");
+            details.put("field", CRITERIA_FIELD);
             details.put("issue", "Invalid sorting criteria provided");
             error.setDetails(details);
         } else {
@@ -49,7 +51,7 @@ public class CustomExceptionHandler {
         error.setTimestamp(nowToUtcOffsetDateTime());
 
         Map<String, Object> details = new HashMap<>();
-        details.put("field", "criteria");
+        details.put("field", CRITERIA_FIELD);
         details.put("issue", "Criteria cannot be null");
         error.setDetails(details);
 
@@ -91,8 +93,8 @@ public class CustomExceptionHandler {
         // Intentar extraer información más específica del error
         String originalMessage = ex.getMessage();
         if (originalMessage != null) {
-            if (originalMessage.contains("criteria")) {
-                details.put("field", "criteria");
+            if (originalMessage.contains(CRITERIA_FIELD)) {
+                details.put("field", CRITERIA_FIELD);
                 details.put("hint", "Ensure 'criteria' object is provided with valid 'weights'");
             } else if (originalMessage.contains("weights")) {
                 details.put("field", "criteria.weights");

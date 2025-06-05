@@ -212,8 +212,8 @@ class ProductControllerAdapterTest {
         productControllerAdapter.sortProducts(request);
 
         // Then
-        verify(productServicePort, times(1)).sortProducts(eq(expectedCriteria));
-        verify(productMapper, times(1)).toResponse(eq(sortedProducts), eq(expectedCriteria));
+        verify(productServicePort, times(1)).sortProducts(expectedCriteria);
+        verify(productMapper, times(1)).toResponse(sortedProducts, expectedCriteria);
     }
 
     @Test
