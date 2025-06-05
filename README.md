@@ -58,20 +58,20 @@ java -jar boot/target/product-manager-boot-1.0.0.jar
 
 Accede a la interfaz de Swagger en el siguiente enlace:
 
-* [Open API sswagger 3.0](https://github.com/NAO2503/product-manager/blob/main/driving/api-rest/contracts/openapi.yaml)
+* [Open API sswagger 3.0](https://github.com/NAO0325/product-manager/blob/main/driving/api-rest/contracts/openapi.yaml)
 
 ### Pruebas
 
 Recomendamos utilizar Postman importando la colección desde este enlace:
 
-* [Price.postman_collection.json](https://github.com/NAO2503/product-manager/blob/main/driving/api-rest/postman/Product.postman_collection.json)
+* [Product.postman_collection.json](https://github.com/NAO0325/product-manager/blob/main/driving/api-rest/postman/Product.postman_collection.json)
 
 #### Visualización interactiva
 
 Puedes visualizar la API de forma interactiva a través de estos enlaces:
 
-[![API Docs](https://img.shields.io/badge/API%20Docs-Swagger-green)](https://editor.swagger.io/?url=https://raw.githubusercontent.com/NAO2503/product-manager/main/driving/api-rest/contracts/openapi.yaml)
-[![API Docs](https://img.shields.io/badge/API%20Docs-Redoc-orange)](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/NAO2503/product-manager/main/driving/api-rest/contracts/openapi.yaml)
+[![API Docs](https://img.shields.io/badge/API%20Docs-Swagger-green)](https://editor.swagger.io/?url=https://raw.githubusercontent.com/NAO0325/product-manager/main/driving/api-rest/contracts/openapi.yaml)
+[![API Docs](https://img.shields.io/badge/API%20Docs-Redoc-orange)](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/NAO0325/product-manager/main/driving/api-rest/contracts/openapi.yaml)
 
 #### Endpoints principales
 
