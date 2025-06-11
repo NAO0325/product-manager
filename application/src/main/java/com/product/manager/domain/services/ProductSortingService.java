@@ -1,43 +1,50 @@
 package com.product.manager.domain.services;
 
 import com.product.manager.domain.Product;
+import com.product.manager.domain.services.scoring.ScoringCriterion;
 import com.product.manager.domain.valueobjects.SortingCriteria;
+import com.product.manager.domain.valueobjects.WeightedScoringCriterion;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class ProductSortingService {
 
+    private final ScoringCriteriaFactory criteriaFactory;
+
+    public ProductSortingService() {
+        this.criteriaFactory = new ScoringCriteriaFactory();
+    }
+
     public List<Product> sortProducts(List<Product> products, SortingCriteria criteria) {
+
+        if (CollectionUtils.isEmpty(products)) {
+            return new ArrayList<>();
+        }
 
         if (!criteria.isValid()) {
             throw new IllegalArgumentException("Invalid sorting criteria");
         }
 
-        // Calcular valor máximo de ventas para normalización
-        int maxSales = products.stream()
-                .mapToInt(Product::getSalesUnits)
-                .max()
-                .orElse(1);
+        List<WeightedScoringCriterion> weightedCriteria = criteriaFactory.createWeightedCriteria(criteria);
 
-        // Ordenar por puntuación ponderada (descendente)
+
         return products.stream()
                 .sorted(Comparator.comparingDouble(
-                        (Product p) -> calculateScore(p, criteria, maxSales)
+                        (Product p) -> calculateTotalScore(p, products, weightedCriteria)
                 ).reversed())
                 .toList();
     }
 
-    private Double calculateScore(Product product, SortingCriteria criteria, int maxSales) {
-
-        // Criterio 1: Normalizar ventas (0-1)
-        double salesScore = (double) product.getSalesUnits() / maxSales;
-
-        // Criterio 2: Ratio de stock (ya está normalizado 0-1)
-        double stockRatioScore = product.getStockRatio();
-
-        // Suma ponderada
-        return (salesScore * criteria.getSalesWeight()) +
-                (stockRatioScore * criteria.getStockRatioWeight());
+    /**
+     * Calcula la puntuación total combinando todos los criterios ponderados
+     */
+    private double calculateTotalScore(Product product, List<Product> allProducts,
+                                       List<WeightedScoringCriterion> weightedCriteria) {
+        return weightedCriteria.stream()
+                .mapToDouble(criterion -> criterion.calculateWeightedScore(product, allProducts))
+                .sum();
     }
 }

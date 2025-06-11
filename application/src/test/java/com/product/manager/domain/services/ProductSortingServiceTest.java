@@ -244,6 +244,25 @@ class ProductSortingServiceTest {
         assertNotSame(result, products); // Es una nueva lista
     }
 
+    @Test
+    void shouldSortProductsWithMultipleCriteria() {
+        // Given
+        ProductSortingService service = new ProductSortingService();
+
+        SortingCriteria criteria = SortingCriteria.builder()
+                .salesWeight(0.6)
+                .stockRatioWeight(0.4)
+                .build();
+
+        // When
+        List<Product> result = service.sortProducts(products, criteria);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        // Verificar orden según puntuación combinada
+    }
+
     private double calculateExpectedScore(Product product, SortingCriteria criteria, int maxSales) {
         double salesScore = (double) product.getSalesUnits() / maxSales;
         double stockRatioScore = product.getStockRatio();

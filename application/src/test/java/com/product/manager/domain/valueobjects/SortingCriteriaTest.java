@@ -134,11 +134,35 @@ class SortingCriteriaTest {
     }
 
     @Test
+    void shouldBeInvalidWithPositiveSalesWeight() {
+        // Given
+        SortingCriteria criteria = SortingCriteria.builder()
+                .salesWeight(2.0)
+                .stockRatioWeight(0.3)
+                .build();
+
+        // When & Then
+        assertFalse(criteria.isValid());
+    }
+
+    @Test
     void shouldBeInvalidWithNegativeStockRatioWeight() {
         // Given
         SortingCriteria criteria = SortingCriteria.builder()
                 .salesWeight(0.7)
                 .stockRatioWeight(-0.3)
+                .build();
+
+        // When & Then
+        assertFalse(criteria.isValid());
+    }
+
+    @Test
+    void shouldBeInvalidWithPositiveStockRatioWeight() {
+        // Given
+        SortingCriteria criteria = SortingCriteria.builder()
+                .salesWeight(0.7)
+                .stockRatioWeight(2.0)
                 .build();
 
         // When & Then

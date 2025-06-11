@@ -15,7 +15,11 @@ public class SortingCriteria {
     private Double stockRatioWeight; // Peso para criterio de ratio de stock
 
     public boolean isValid() {
-        return salesWeight != null && (salesWeight >= 0 && salesWeight <= 1) &&
-                stockRatioWeight != null && (stockRatioWeight >= 0 && stockRatioWeight <= 1);
+        return isValidWeight(salesWeight) &&
+                isValidWeight(stockRatioWeight); // Añadir validación para cada peso por criterio
+    }
+
+    private boolean isValidWeight(Double weight) {
+        return weight != null && (weight >= 0 && weight <= 1);
     }
 }
