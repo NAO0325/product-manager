@@ -101,9 +101,15 @@ product-manager/
 │   ├── 📁 domain/                                    # Entidades del dominio
 │   │   ├── 📄 Product.java                          # Entidad principal Product
 │   │   ├── 📁 valueobjects/                         # Value Objects
-│   │   │   └── 📄 SortingCriteria.java              # Criterios de ordenación
+│   │   │   ├── 📄 SortingCriteria.java              # Criterios de ordenación
+│   │   │   └── 📄 WeightedScoringCriterion.java     # Criterio con peso asociado
 │   │   └── 📁 services/                             # Servicios de dominio
-│   │       └── 📄 ProductSortingService.java        # Servicio ordenación productos
+│   │       ├── 📄 ProductSortingService.java        # Servicio ordenación productos
+│   │       ├── 📄 ScoringCriteriaFactory.java       # Factory de criterios ponderados
+│   │       └── 📁 scoring/                          # Criterios de puntuación específicos
+│   │           ├── 📄 ScoringCriterion.java         # Interface criterio puntuación
+│   │           ├── 📄 SalesUnitsScoringCriterion.java # Criterio ventas
+│   │           └── 📄 StockRatioScoringCriterion.java # Criterio stock
 │   ├── 📁 ports/                                    # Interfaces (driving/driven)
 │   │   ├── 📁 driving/                              # Puertos de entrada
 │   │   │   └── 📄 ProductServicePort.java           # Puerto servicio Product
@@ -446,34 +452,97 @@ INSERT INTO PRODUCT_STOCK (PRODUCT_ID, SIZE, QUANTITY) VALUES
 
 ### Funcionamiento del Algoritmo
 
-El algoritmo implementa una **suma ponderada** que combina criterios normalizados:
+El algoritmo implementa una **suma ponderada** que combina criterios normalizados utilizando el **patrón Strategy** y **Factory Pattern** para máxima extensibilidad:
 
 ```java
-// Pseudocódigo del algoritmo
-puntuaciónFinal = (ventasNormalizadas × pesoVentas) + (ratioStock × pesoStock)
+// Arquitectura del algoritmo mejorada
+public class ProductSortingService {
+    private final ScoringCriteriaFactory criteriaFactory;
+    
+    // 1. Crear criterios ponderados usando Factory Pattern
+    List<WeightedScoringCriterion> weightedCriteria = 
+        criteriaFactory.createWeightedCriteria(criteria);
+    
+    // 2. Calcular puntuación total combinando criterios
+    puntuaciónFinal = Σ(criterio.calculateWeightedScore(producto, todosLosProductos))
+    
+    // 3. Ordenar por puntuación descendente
+    return productos.sorted(byScoreDescending)
+}
 
 donde:
-- ventasNormalizadas = ventasProducto / ventasMáximas  // 0-1
-- ratioStock = tallasConStock / totalTallas           // 0-1  
-- pesoVentas + pesoStock = pesos configurables        // 0-1
+- ScoringCriterion: Interface para criterios específicos
+- WeightedScoringCriterion: Value Object que encapsula criterio + peso
+- ScoringCriteriaFactory: Crea criterios basándose en configuración
+```
+
+### Arquitectura de Criterios de Puntuación
+
+#### 🏭 Factory Pattern para Criterios
+```java
+// ScoringCriteriaFactory
+Map<String, ScoringCriterion> availableCriteria = Map.of(
+    "SALES_UNITS", new SalesUnitsScoringCriterion(),
+    "STOCK_RATIO", new StockRatioScoringCriterion()
+    // Fácil añadir nuevos: "MARGIN", new MarginScoringCriterion()
+);
+```
+
+#### 🎯 Strategy Pattern para Cálculos
+```java
+// Interface común para todos los criterios
+public interface ScoringCriterion {
+    double calculateScore(Product product, List<Product> allProducts);
+    String getCriterionName();
+}
+```
+
+#### ⚖️ Value Object para Pesos
+```java
+// Encapsula criterio + peso con validaciones
+public class WeightedScoringCriterion {
+    private ScoringCriterion criterion;
+    private double weight; // 0.0 - 1.0
+    
+    public double calculateWeightedScore(Product product, List<Product> allProducts) {
+        return criterion.calculateScore(product, allProducts) * weight;
+    }
+}
 ```
 
 ### Criterios de Ordenación
 
-#### 1. Criterio de Ventas por Unidades
+#### 1. Criterio de Ventas por Unidades (`SalesUnitsScoringCriterion`)
 - **Cálculo**: Normalización lineal basada en el producto con más ventas
+- **Fórmula**: `ventasProducto / ventasMáximas`
 - **Rango**: 0.0 (sin ventas) a 1.0 (máximas ventas)
 - **Propósito**: Priorizar productos con mayor rendimiento comercial
 
-#### 2. Criterio de Ratio de Stock
+#### 2. Criterio de Ratio de Stock (`StockRatioScoringCriterion`)
 - **Cálculo**: `tallasDisponibles / totalTallas`
 - **Rango**: 0.0 (sin stock) a 1.0 (stock completo)
 - **Propósito**: Priorizar productos con mejor disponibilidad
 
-#### 3. Extensibilidad
-- **Diseño modular**: Nuevos criterios se pueden añadir fácilmente
-- **Arquitectura preparada**: Interface `SortingCriteria` permite expansión
+#### 3. Extensibilidad (Nuevos Criterios)
+- **Diseño modular**: Implementar `ScoringCriterion` interface
+- **Registro automático**: Añadir al `ScoringCriteriaFactory`
 - **Sin romper compatibilidad**: Los criterios existentes seguirán funcionando
+
+**Ejemplo de nuevo criterio:**
+```java
+public class MarginScoringCriterion implements ScoringCriterion {
+    @Override
+    public double calculateScore(Product product, List<Product> allProducts) {
+        // Lógica de cálculo de margen
+        return normalizedMargin;
+    }
+    
+    @Override
+    public String getCriterionName() {
+        return "MARGIN";
+    }
+}
+```
 
 ### Ejemplos de Cálculo
 
@@ -576,17 +645,9 @@ mvn clean compile test-compile test
 
 #### IDE Recomendado
 - **IntelliJ IDEA** con plugins:
-    - Lombok Plugin
-    - MapStruct Support
-    - SonarLint
-
-#### Configuración Git Hooks
-```bash
-# Instalar pre-commit hooks (opcional)
-# Ejecutar tests antes de cada commit
-echo "mvn test" > .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
-```
+  - Lombok Plugin
+  - MapStruct Support
+  - SonarLint
 
 ## 📊 Calidad de Código
 
@@ -610,20 +671,19 @@ El proyecto incluye CI/CD automatizado que ejecuta en cada push:
 - ✅ Cache de dependencias Maven
 ```
 
-## 🎯 Cumplimiento de Caso Práctico
+## 🎯 Cumplimiento del Caso Práctico
 
 ### ✅ Requisitos Implementados
 
 | Requisito | Estado | Implementación |
 |-----------|--------|----------------|
-| **Algoritmo de ordenación con criterios ponderados** | ✅ | `ProductSortingService.java` |
-| **Criterio de ventas por unidades** | ✅ | Normalización lineal basada en `salesUnits` |
-| **Criterio de ratio de stock** | ✅ | Cálculo de `tallasConStock / totalTallas` |
-| **Suma ponderada de criterios** | ✅ | Formula: `(salesScore × salesWeight) + (stockScore × stockWeight)` |
-| **Extensibilidad para nuevos criterios** | ✅ | Arquitectura modular permite añadir criterios |
+| **Algoritmo de ordenación con criterios ponderados** | ✅ | `ProductSortingService.java` + Strategy Pattern |
+| **Criterio de ventas por unidades** | ✅ | `SalesUnitsScoringCriterion.java` |
+| **Criterio de ratio de stock** | ✅ | `StockRatioScoringCriterion.java` |
+| **Suma ponderada de criterios** | ✅ | `WeightedScoringCriterion.java` |
+| **Extensibilidad para nuevos criterios** | ✅ | Interface `ScoringCriterion` + Factory Pattern |
 | **Servicio REST con pesos configurables** | ✅ | `POST /v1/products/sort` con JSON de pesos |
 | **Datos del listado proporcionado** | ✅ | Los 6 productos exactos del PDF en `init.sql` |
-
 
 ### 🎯 Casos de Uso Demostrados
 
@@ -651,29 +711,36 @@ El proyecto incluye CI/CD automatizado que ejecuta en cada push:
 
 #### ✨ **Características Implementadas**
 - **Algoritmo de ordenación por criterios ponderados** según especificación solicitada
+- **Patrón Strategy** para criterios de puntuación extensibles
+- **Factory Pattern** para creación dinámica de criterios
+- **Value Objects** para encapsular criterios con pesos
 - **API REST completa** con validaciones robustas y manejo de errores
 - **Arquitectura hexagonal** con separación clara de responsabilidades
-- **Base de datos H2** con datos de prueba precargados
+- **Base de datos H2** con datos exactos del caso práctico
 - **Tests comprehensivos** cubriendo todos los escenarios de uso
 
 #### 🔧 **Funcionalidades Técnicas**
 - **Cálculo de ratio de stock** preciso con redondeo a 2 decimales
 - **Normalización de ventas** lineal para comparación justa
 - **Suma ponderada configurable** via API REST
+- **Criterios modulares** con interface `ScoringCriterion`
+- **Factory de criterios** para extensibilidad sin modificar código existente
 - **Mapeo automático** con MapStruct entre capas
 - **Validación de entrada** con respuestas de error detalladas
 
 #### 📚 **Documentación y Testing**
 - OpenAPI 3.0 specification completa con ejemplos
 - Postman collection con casos de prueba automatizados
-- Tests unitarios y de integración con alta cobertura
-- Documentación arquitectural con diagramas
+- Tests unitarios para cada criterio de puntuación específico
+- Tests de integración con alta cobertura
+- Documentación arquitectural con diagramas de patrones
 
 #### 🎯 **Cumplimiento del Caso Práctico**
-- ✅ Implementación exacta de todos los requisitos solicitados
+- ✅ Implementación exacta de todos los requisitos ITX
 - ✅ Datos de productos idénticos a la especificación
-- ✅ Algoritmo extensible para futuros criterios
+- ✅ Algoritmo extensible con patrones de diseño enterprise
 - ✅ Servicio REST que recibe pesos configurables
+- ✅ Arquitectura preparada para escalar con nuevos criterios
 
 ## 📄 Licencia
 
@@ -707,17 +774,25 @@ Si tienes preguntas o sugerencias:
 - [ ] Añadir métricas con Micrometer/Prometheus
 - [ ] Dockerización completa con Docker Compose
 - [ ] Deploy automatizado a AWS/Azure
-- [ ] **Nuevos criterios de ordenación**:
-    - [ ] Criterio de margen de beneficio
-    - [ ] Criterio de rotación de stock
-    - [ ] Criterio de tendencias estacionales
-    - [ ] Criterio de valoraciones de clientes
+- [ ] **Nuevos criterios de ordenación** (usando la arquitectura extensible):
+  - [ ] Criterio de margen de beneficio (`MarginScoringCriterion`)
+  - [ ] Criterio de rotación de stock (`TurnoverScoringCriterion`)
+  - [ ] Criterio de tendencias estacionales (`SeasonalScoringCriterion`)
+  - [ ] Criterio de valoraciones de clientes (`RatingScoringCriterion`)
 - [ ] **Optimizaciones de algoritmo**:
-    - [ ] Cache de cálculos de puntuación
-    - [ ] Paralelización para grandes volúmenes
-    - [ ] Algoritmos de machine learning para predicción
+  - [ ] Cache de cálculos de puntuación con Redis
+  - [ ] Paralelización para grandes volúmenes con CompletableFuture
+  - [ ] Algoritmos de machine learning para predicción
+  - [ ] Optimización de queries con índices específicos
 - [ ] **Mejoras de API**:
-    - [ ] Paginación de resultados
-    - [ ] Filtros avanzados (por categoría, precio, etc.)
-    - [ ] Ordenación personalizada por campo
-    - [ ] Exportación de resultados (CSV, Excel)
+  - [ ] Paginación de resultados
+  - [ ] Filtros avanzados (por categoría, precio, etc.)
+  - [ ] Ordenación personalizada por campo
+  - [ ] Exportación de resultados (CSV, Excel)
+
+#### 🎖️ Patrones de Diseño Implementados:
+- **Strategy Pattern**: Criterios de puntuación intercambiables
+- **Factory Pattern**: Creación dinámica de criterios ponderados
+- **Value Object**: Encapsulación de criterios con pesos
+- **Ports & Adapters**: Arquitectura hexagonal clean
+- **Dependency Injection**: Inversión de control con Spring
