@@ -1,7 +1,6 @@
 package com.product.manager.domain.services;
 
 import com.product.manager.domain.Product;
-import com.product.manager.domain.services.scoring.ScoringCriterion;
 import com.product.manager.domain.valueobjects.SortingCriteria;
 import com.product.manager.domain.valueobjects.WeightedScoringCriterion;
 import org.springframework.util.CollectionUtils;
